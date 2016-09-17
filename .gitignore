@@ -108,3 +108,5 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# exlude submissions
+submissions/
