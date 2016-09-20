@@ -40,12 +40,3 @@ class Data:
         
         self.data[feature_name] = lbl.transform(self.data[feature_name])
         return self.data[feature_name]
-    
-    @staticmethod
-    def remove_CO2_band(features):
-        CO2_band_start = list(features).index('m2379.76')
-        CO2_band_end = CO2_band_start + 15
-        
-        CO2_band = features[CO2_band_start:CO2_band_end]
-        
-        return features.drop(CO2_band)
