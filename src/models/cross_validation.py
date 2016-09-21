@@ -7,40 +7,36 @@ sys.path.append(os.path.join(basepath, 'src'))
 
 from models import eval_metric
 
-def cv_scheme(pipelines, X, y_Ca, y_P, y_Sand, y_SOC, y_pH):
-	cv = KFold(len(X), n_folds=5, shuffle=True, random_state=10)
+def cv_scheme(pipelines, Xs, ys):
+	cv = KFold(len(Xs[0]), n_folds=10, shuffle=True, random_state=10)
 	
 	scores = 0
-	for itrain, itest in cv:
-		Xtr = X.iloc[itrain]
-		
-		ytr_Ca = y_Ca.iloc[itrain]
-		ytr_P = y_P.iloc[itrain]
-		ytr_Sand = y_Sand.iloc[itrain]
-		ytr_SOC = y_SOC.iloc[itrain]
-		ytr_pH = y_pH.iloc[itrain]
-		
-		Xte = X.iloc[itest]
-		
-		yte_Ca = y_Ca.iloc[itest]
-		yte_P = y_P.iloc[itest]
-		yte_Sand = y_Sand.iloc[itest]
-		yte_SOC = y_SOC.iloc[itest]
-		yte_pH = y_pH.iloc[itest]
-	
-		pipelines[0].fit(Xtr, ytr_Ca)
-		pipelines[1].fit(Xtr, ytr_P)
-		pipelines[2].fit(Xtr, ytr_Sand)
-		pipelines[3].fit(Xtr, ytr_SOC)
-		pipelines[4].fit(Xtr, ytr_pH)
-		
-		ypred_Ca = pipelines[0].predict(Xte)
-		ypred_P = pipelines[1].predict(Xte)
-		ypred_Sand = pipelines[2].predict(Xte)
-		ypred_SOC = pipelines[3].predict(Xte)
-		ypred_pH = pipelines[4].predict(Xte)
+	index = 0
 
-		scores += eval_metric.mcrmse([yte_Ca, yte_P, yte_pH, yte_Sand, yte_SOC], [ypred_Ca, ypred_P, ypred_pH, ypred_Sand, ypred_SOC])
+	for itrain, itest in cv:
+		print('======== Iteration: %d\n'%index)
+		index   = index + 1
+
+		y_preds = []
+		y_true  = []
+		
+		for i in range(len(pipelines)):
+			Xtr = Xs[i].iloc[itrain]
+			ytr = ys[i].iloc[itrain]
+
+			Xte = Xs[i].iloc[itest]
+			yte = ys[i].iloc[itest]
+
+			pipelines[i].fit(Xtr, ytr)
+			pred = pipelines[i].predict(Xte)
+			
+			y_true.append(yte)
+			y_preds.append(pred)
+
+		score = eval_metric.mcrmse(y_true, y_preds)
+		print('MCRMSE score: %f\n'%score)
+
+		scores = scores + score
 	
 	return scores / len(cv)
 
