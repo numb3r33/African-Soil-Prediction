@@ -14,7 +14,6 @@ def cv_scheme(pipelines, Xs, ys):
 	index = 0
 
 	for itrain, itest in cv:
-		print('======== Iteration: %d\n'%index)
 		index   = index + 1
 
 		y_preds = []
@@ -34,8 +33,7 @@ def cv_scheme(pipelines, Xs, ys):
 			y_preds.append(pred)
 
 		score = eval_metric.mcrmse(y_true, y_preds)
-		print('MCRMSE score: %f\n'%score)
-
+		
 		scores = scores + score
 	
 	return scores / len(cv)
