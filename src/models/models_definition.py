@@ -1,7 +1,8 @@
 from sklearn.pipeline import Pipeline
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import RandomizedPCA, PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
+from sklearn.ensemble import BaggingRegressor
 
 def get_models_by_dataset(dataset_name):
     """
@@ -14,17 +15,17 @@ def get_models_by_dataset(dataset_name):
     models = {
         'dataset_1': [
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', PCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='rbf'))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', PCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='linear'))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', PCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='poly'))
             ])
@@ -32,51 +33,48 @@ def get_models_by_dataset(dataset_name):
         
         'dataset_2': [
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', PCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='rbf'))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', PCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='linear'))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', PCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='poly'))
             ])
         ],
         'dataset_3': [
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
                 ('scaler', StandardScaler()),
-                ('model', SVR(kernel='rbf'))
+                ('model', (SVR(kernel='rbf')))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
                 ('scaler', StandardScaler()),
-                ('model', SVR(kernel='linear'))
+                ('model', (SVR(kernel='linear')))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
                 ('scaler', StandardScaler()),
-                ('model', SVR(kernel='poly'))
+                ('model', (SVR(kernel='poly')))
             ])
         ],
         'dataset_4': [
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', RandomizedPCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='rbf'))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', RandomizedPCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='linear'))
             ]),
             Pipeline([
-                ('pca', RandomizedPCA(n_components=125, whiten=True, random_state=11)),
+                ('pca', RandomizedPCA(n_components=125, whiten=True)),
                 ('scaler', StandardScaler()),
                 ('model', SVR(kernel='poly'))
             ])
