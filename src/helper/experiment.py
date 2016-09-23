@@ -21,13 +21,11 @@ if __name__ == '__main__':
 	train = pd.read_csv(os.path.join(basepath, 'data/raw/training.csv'))
 	test = pd.read_csv(os.path.join(basepath, 'data/raw/sorted_test.csv'))
 	
-	# load processed dataset
-	# let's load a dataset
-	train_filepath = 'data/processed/%s/train/train'%dataset_name
-	test_filepath  = 'data/processed/%s/test/test'%dataset_name
+	
+	# labels
+	labels = ['Ca', 'P', 'Sand', 'SOC', 'pH'] # take from command line
 
-	train_, test_  = utils.load_dataset(train_filepath, test_filepath)	
-
+	trains_, tests_  = utils.load_datasets(dataset_name, labels)	
 
 	y_Ca, y_P, y_Sand, y_SOC, y_pH = utils.define_target_variables(train)
 
@@ -38,20 +36,32 @@ if __name__ == '__main__':
 		'random_state' : 4
 	}
 
-	itrain, itest = cross_validation.split_dataset(len(train_), **params)
+	itrain, itest = cross_validation.split_dataset(len(train), **params)
 
-	X_train, X_test    = utils.get_Xs(train_, itrain, itest) # split the dataset into training and test set.
+	X_train_Ca, X_test_Ca        = utils.get_Xs(trains_[0], itrain, itest) 
+	X_train_P, X_test_P          = utils.get_Xs(trains_[1], itrain, itest) 
+	X_train_Sand, X_test_Sand    = utils.get_Xs(trains_[2], itrain, itest) 
+	X_train_SOC, X_test_SOC      = utils.get_Xs(trains_[3], itrain, itest) 
+	X_train_pH, X_test_pH        = utils.get_Xs(trains_[4], itrain, itest)
+
+	X_trains = [X_train_Ca, X_train_P, X_train_Sand, X_train_SOC, X_train_pH]
+	X_tests = [X_test_Ca, X_test_P, X_test_Sand, X_test_SOC, X_test_pH]
+
 	y_trains, y_tests  = utils.get_Ys(y_Ca, y_P, y_Sand, y_SOC, y_pH, itrain, itest)
 
 	y_train_Ca, y_train_P, y_train_Sand, y_train_SOC, y_train_pH = y_trains
-	y_test_Ca, y_test_P, y_test_Sand, y_test_SOC, y_test_pH      = y_tests
+	y_test_Ca, y_test_P, y_test_Sand, y_test_SOC, y_test_pH = y_tests
 
 	print('Get models by dataset\n')
 	models = models_definition.get_models_by_dataset(dataset_name)
 
 	print('Training Models\n')
-	trained_models = utils.train_models(models, [X_train, X_train, X_train, X_train, X_train], \
-									  [y_train_Ca, y_train_P, y_train_Sand, y_train_SOC, y_train_pH])
+	
+	model_names = ['rbf', 'linear', 'poly'] # take from command line
+	test_preds = np.empty((len(labels), len(model_names)), dtype=np.ndarray)
 
-	print('Save Models\n')
-	utils.save_models(trained_models, dataset_name)
+	for i in range(len(labels)):
+		for j in range(len(model_names)):
+			model = utils.train_model(models[j], X_trains[i], y_trains[i], dataset_name, labels[i], model_names[j])
+			test_preds[i, j] = utils.predict_targets(model, X_tests[i])
+		
