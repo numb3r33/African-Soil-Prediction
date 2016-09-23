@@ -1,3 +1,18 @@
+import numpy as np
+import os, sys
+
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.decomposition import RandomizedPCA
+from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import f_classif, SelectKBest
+from sklearn.svm import SVR
+from sklearn.externals import joblib
+
+basepath = os.path.expanduser('~/Desktop/src/African_Soil_Property_Prediction/')
+sys.path.append(os.path.join(basepath, 'src'))
+
+
+
 def remove_CO2_band(features):
 	"""
 	Takes in a list of features,
@@ -54,3 +69,71 @@ def predict_targets(trained_models, Xs):
             predictions[i, j] = trained_models[i, j].predict(Xs[i])
         
     return predictions
+
+
+# load a dataset
+def load_dataset(train_filepath, test_filepath):
+	train_    = joblib.load(os.path.join(basepath, train_filepath))
+	test_     = joblib.load(os.path.join(basepath, test_filepath))
+	
+	return train_, test_
+
+# define target variables
+def define_target_variables(train):    
+	
+	y_Ca    = train.Ca
+	y_P     = train.P
+	y_Sand  = train.Sand
+	y_SOC   = train.SOC
+	y_pH    = train.pH
+	
+	return y_Ca, y_P, y_Sand, y_SOC, y_pH
+
+# train models for all of the target varibles
+def train_models(models, Xs, ys):
+	"""
+	models : List of models that should be trained on a given (X, y)
+	Xs     : List of feature set for all of the target variables
+	ys     : List of the target variables
+	"""
+	
+	n_target = len(ys)
+	n_models = len(models)
+	
+	trained_models = np.empty((n_target, n_models), dtype=Pipeline)
+	
+	for i in range(n_target):
+		for j in range(n_models):
+			trained_models[i, j] = models[j].fit(Xs[i], ys[i])
+
+	return trained_models
+
+# save the trained models against a dataset name
+def save_models(trained_models, dataset_name):
+	labels = ['Ca', 'P', 'Sand', 'SOC', 'pH']
+	model_names  = ['rbf', 'linear', 'poly']
+	
+	for i in range(len(labels)):
+		for j in range(len(model_names)):
+			filepath = 'data/processed/%s/models/%s/%s/%s'%(dataset_name, labels[i], model_names[j], model_names[j])
+			joblib.dump(trained_models[i, j], os.path.join(basepath, filepath))
+
+	print('All models written to disk successfully')
+
+
+# load the models trained on a dataset for every target variable
+def load_models(dataset_name):
+	labels      = ['Ca', 'P', 'Sand', 'SOC', 'pH']
+	model_names = ['rbf', 'linear', 'poly']
+
+	n_target = len(labels)
+	n_models = len(model_names)
+
+	trained_models = np.empty((n_target, n_models), dtype=Pipeline)
+
+	for i in range(n_target):
+		for j in range(n_models):
+			filepath = 'data/processed/%s/models/%s/%s/%s'%(dataset_name, labels[i], model_names[j], model_names[j])
+			trained_models[i, j] = joblib.load(os.path.join(basepath, filepath))
+
+	return trained_models
