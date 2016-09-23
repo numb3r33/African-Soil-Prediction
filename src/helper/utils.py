@@ -53,23 +53,13 @@ def get_Ys(y_Ca, y_P, y_Sand, y_SOC, y_pH, itrain, itest):
 	return ([y_train_Ca, y_train_P, y_train_Sand, y_train_SOC, y_train_pH],
 			[y_test_Ca, y_test_P, y_test_Sand, y_test_SOC, y_test_pH])
 
-def predict_targets(trained_models, Xs):
-    """
-    trained_models : List of the trained models
-    Xs             : Held out examples for each of the target variables
-    """
-    
-    n_target = len(Xs)
-    n_models = len(trained_models[0])
-    
-    predictions = np.empty((n_target, n_models), dtype=np.ndarray)
-    
-    for i in range(n_target):
-        for j in range(n_models):
-            predictions[i, j] = trained_models[i, j].predict(Xs[i])
-        
-    return predictions
-
+def predict_targets(trained_model, Xs):
+	"""
+	trained_model  : Trained Model.
+	Xs             : Held out examples.
+	"""
+	return trained_model.predict(Xs)
+	
 
 # load a dataset
 def load_dataset(train_filepath, test_filepath):
@@ -77,6 +67,22 @@ def load_dataset(train_filepath, test_filepath):
 	test_     = joblib.load(os.path.join(basepath, test_filepath))
 	
 	return train_, test_
+
+def load_datasets(dataset_name, labels):
+	trains_ = []
+	tests_  = []
+
+	for i in range(len(labels)):
+	    # let's load a dataset
+	    train_filepath = 'data/processed/%s/%s/train/train'%(dataset_name, labels[i])
+	    test_filepath  = 'data/processed/%s/%s/test/test'%(dataset_name, labels[i])
+
+	    train_, test_  = load_dataset(train_filepath, test_filepath)
+	    
+	    trains_.append(train_)
+	    tests_.append(test_)
+
+	return trains_, tests_
 
 # define target variables
 def define_target_variables(train):    
@@ -90,35 +96,25 @@ def define_target_variables(train):
 	return y_Ca, y_P, y_Sand, y_SOC, y_pH
 
 # train models for all of the target varibles
-def train_models(models, Xs, ys):
+def train_model(model, Xs, ys, dataset_name, label_name, model_name):
 	"""
 	models : List of models that should be trained on a given (X, y)
 	Xs     : List of feature set for all of the target variables
 	ys     : List of the target variables
 	"""
 	
-	n_target = len(ys)
-	n_models = len(models)
-	
-	trained_models = np.empty((n_target, n_models), dtype=Pipeline)
-	
-	for i in range(n_target):
-		for j in range(n_models):
-			trained_models[i, j] = models[j].fit(Xs[i], ys[i])
+	model = Pipeline(model)
+	model = model.fit(Xs, ys)
+	save_model(model, dataset_name, label_name, model_name)
 
-	return trained_models
+	return model # return back for prediction
 
 # save the trained models against a dataset name
-def save_models(trained_models, dataset_name):
-	labels = ['Ca', 'P', 'Sand', 'SOC', 'pH']
-	model_names  = ['rbf', 'linear', 'poly']
-	
-	for i in range(len(labels)):
-		for j in range(len(model_names)):
-			filepath = 'data/processed/%s/models/%s/%s/%s'%(dataset_name, labels[i], model_names[j], model_names[j])
-			joblib.dump(trained_models[i, j], os.path.join(basepath, filepath))
+def save_model(trained_model, dataset_name, label_name, model_name):
+	filepath = 'data/processed/%s/%s/models/%s/%s'%(dataset_name, label_name, model_name, model_name)
+	joblib.dump(trained_model, os.path.join(basepath, filepath))
 
-	print('All models written to disk successfully')
+	print('Model saved successfully')
 
 
 # load the models trained on a dataset for every target variable
