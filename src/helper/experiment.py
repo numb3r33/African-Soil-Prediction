@@ -15,6 +15,7 @@ from helper import utils
 
 if __name__ == '__main__':
 	dataset_name = sys.argv[1]
+	split_dataset = sys.argv[2]
 
 	print('Loading Files\n')
 	# load files
@@ -31,26 +32,33 @@ if __name__ == '__main__':
 
 	# lets get the train and test indices
 
-	params = {
-		'test_size' : 0.2,
-		'random_state' : 4
-	}
+	if split_dataset == 'yes':
+		params = {
+			'test_size' : 0.2,
+			'random_state' : 4
+		}
 
-	itrain, itest = cross_validation.split_dataset(len(train), **params)
+		itrain, itest = cross_validation.split_dataset(len(train), **params)
 
-	X_train_Ca, X_test_Ca        = utils.get_Xs(trains_[0], itrain, itest) 
-	X_train_P, X_test_P          = utils.get_Xs(trains_[1], itrain, itest) 
-	X_train_Sand, X_test_Sand    = utils.get_Xs(trains_[2], itrain, itest) 
-	X_train_SOC, X_test_SOC      = utils.get_Xs(trains_[3], itrain, itest) 
-	X_train_pH, X_test_pH        = utils.get_Xs(trains_[4], itrain, itest)
+		X_train_Ca, X_test_Ca        = utils.get_Xs(trains_[0], itrain, itest) 
+		X_train_P, X_test_P          = utils.get_Xs(trains_[1], itrain, itest) 
+		X_train_Sand, X_test_Sand    = utils.get_Xs(trains_[2], itrain, itest) 
+		X_train_SOC, X_test_SOC      = utils.get_Xs(trains_[3], itrain, itest) 
+		X_train_pH, X_test_pH        = utils.get_Xs(trains_[4], itrain, itest)
 
-	X_trains = [X_train_Ca, X_train_P, X_train_Sand, X_train_SOC, X_train_pH]
-	X_tests = [X_test_Ca, X_test_P, X_test_Sand, X_test_SOC, X_test_pH]
+		X_trains = [X_train_Ca, X_train_P, X_train_Sand, X_train_SOC, X_train_pH]
+		X_tests  = [X_test_Ca, X_test_P, X_test_Sand, X_test_SOC, X_test_pH]
 
-	y_trains, y_tests  = utils.get_Ys(y_Ca, y_P, y_Sand, y_SOC, y_pH, itrain, itest)
+		y_trains, y_tests  = utils.get_Ys(y_Ca, y_P, y_Sand, y_SOC, y_pH, itrain, itest)
 
-	y_train_Ca, y_train_P, y_train_Sand, y_train_SOC, y_train_pH = y_trains
-	y_test_Ca, y_test_P, y_test_Sand, y_test_SOC, y_test_pH = y_tests
+		y_train_Ca, y_train_P, y_train_Sand, y_train_SOC, y_train_pH = y_trains
+		y_test_Ca, y_test_P, y_test_Sand, y_test_SOC, y_test_pH = y_tests
+	
+	else:
+		X_trains = trains_
+		X_tests  = tests_ 
+
+		y_trains = [y_Ca, y_P, y_Sand, y_SOC, y_pH]
 
 	print('Get models by dataset\n')
 	models = models_definition.get_models_by_dataset(dataset_name)
