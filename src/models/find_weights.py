@@ -30,4 +30,3 @@ def find(y_test, y_pred):
 	weights = calculate_weights(y_test, stacked_predictions)
 
 	return weights, balance_predictions(y_test, stacked_predictions, weights)
-
