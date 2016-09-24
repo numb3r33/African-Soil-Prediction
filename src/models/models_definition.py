@@ -83,18 +83,18 @@ def get_models_by_dataset(dataset_name):
 		'dataset_5': [
 			[
 				('scaler', StandardScaler()),
-				('pca', PCA(n_components=10, whiten=True)),
-				('model', SVR(C=10.0, kernel='rbf'))
+				('pca', PCA(n_components=100, whiten=True)),
+				('model', SVR(C=1.0, kernel='rbf'))
 			],
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=100, whiten=True)),
-				('model', SVR(C=10.0, kernel='linear'))
+				('model', SVR(C=1.0, kernel='linear'))
 			],
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=100, whiten=True)),
-				('model', SVR(C=10.0, kernel='poly'))
+				('model', SVR(C=1.0, kernel='poly'))
 			],
 
 		]
