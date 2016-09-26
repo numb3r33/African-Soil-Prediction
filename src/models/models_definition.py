@@ -2,7 +2,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import RandomizedPCA, PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-from sklearn.ensemble import BaggingRegressor
+from sklearn.ensemble import BaggingRegressor, RandomForestRegressor
 from sklearn.linear_model import Ridge
 
 def get_models_by_dataset(dataset_name):
@@ -11,6 +11,13 @@ def get_models_by_dataset(dataset_name):
 	we are associating models with the dataset. So we can pass in the dataset name
 	and based on that we will get a list of the models that should be trained on this dataset
 	based on our initial experiments
+
+	Dataset 1: Contains all the infrared measurements
+	Dataset 2: Contains all features other than CO2 band
+	Dataset 3: Contains the spatial features
+	Dataset 4: Grouped values by the wavelength
+	Dataset 5: Features chosen by feature relevance 
+	Dataset 6: T-sne on the wavebands and remove features with low standard deviation
 	"""
 	
 	models = {
@@ -18,17 +25,12 @@ def get_models_by_dataset(dataset_name):
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=125, whiten=True)),
-				('model', SVR(kernel='rbf'))
+				('model', Ridge())
 			],
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=125, whiten=True)),
 				('model', SVR(kernel='linear'))
-			],
-			[
-				('scaler', StandardScaler()),
-				('pca', PCA(n_components=125, whiten=True)),
-				('model', SVR(kernel='poly'))
 			]
 		],
 		
@@ -36,17 +38,12 @@ def get_models_by_dataset(dataset_name):
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=125, whiten=True)),
-				('model', SVR(kernel='rbf'))
+				('model', Ridge())
 			],
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=125, whiten=True)),
 				('model', SVR(kernel='linear'))
-			],
-			[
-				('scaler', StandardScaler()),
-				('pca', PCA(n_components=125, whiten=True)),
-				('model', SVR(kernel='poly'))
 			]
 		],
 		'dataset_3': [
@@ -57,46 +54,40 @@ def get_models_by_dataset(dataset_name):
 			[
 				('scaler', StandardScaler()),
 				('model', (SVR(kernel='linear')))
-			],
-			[
-				('scaler', StandardScaler()),
-				('model', (SVR(kernel='poly')))
 			]
 		],
 		'dataset_4': [
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=125, whiten=True)),
-				('model', SVR(kernel='rbf'))
+				('model', Ridge())
 			],
 			[
 				('scaler', StandardScaler()),
 				('pca', PCA(n_components=125, whiten=True)),
 				('model', SVR(kernel='linear'))
-			],
-			[
-				('scaler', StandardScaler()),
-				('pca', PCA(n_components=125, whiten=True)),
-				('model', SVR(kernel='poly'))
 			]
 		],
 		'dataset_5': [
 			[
 				('scaler', StandardScaler()),
-				('pca', PCA(n_components=100, whiten=True)),
-				('model', SVR(C=1.0, kernel='rbf'))
+				('pca', PCA(n_components=125, whiten=True)),
+				('model', Ridge())
 			],
 			[
 				('scaler', StandardScaler()),
-				('pca', PCA(n_components=100, whiten=True)),
+				('pca', PCA(n_components=125, whiten=True)),
 				('model', SVR(C=1.0, kernel='linear'))
-			],
+			]
+		],
+		'dataset_6': [
 			[
 				('scaler', StandardScaler()),
-				('pca', PCA(n_components=100, whiten=True)),
-				('model', SVR(C=1.0, kernel='poly'))
+				('model', Ridge())
 			],
-
+			[
+				('model', RandomForestRegressor(n_estimators=250, max_depth=15, n_jobs=-1))
+			],
 		]
 	}
 
