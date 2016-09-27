@@ -115,3 +115,7 @@ def save_model(trained_model, dataset_name, label_name, model_name):
 	joblib.dump(trained_model, os.path.join(basepath, filepath))
 
 	print('Model saved successfully')
+
+
+def get_labels():
+	return ['Ca', 'P', 'Sand', 'SOC', 'pH']

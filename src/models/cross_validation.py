@@ -19,6 +19,8 @@ def cv_scheme(model, Xs, ys):
 	# TODO: hard code this configuration as of now, will find a way to modify this.
 	cv = KFold(len(Xs[0]), n_folds=10, shuffle=True, random_state=10)
 	
+	# label names 
+	label_names = ['Ca', 'P', 'Sand', 'SOC', 'pH']
 	
 	model = Pipeline(model)
 		
@@ -41,10 +43,13 @@ def cv_scheme(model, Xs, ys):
 			model.fit(Xtr, ytr)
 
 			y_true.append(yte)
+			pred = model.predict(Xte)
+
+			print('MCRMSE score for label: %s -> %f'%(label_names[i], eval_metric.mcrmse([yte], [pred])))
 			y_pred.append(model.predict(Xte))
 
 		score = eval_metric.mcrmse(y_true, y_pred)
-		print('MCRMSE score: %f\n'%score)
+		print('\nMCRMSE score: %f\n'%score)
 		scores += score
 
 	return scores / len(cv)

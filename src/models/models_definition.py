@@ -2,7 +2,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import RandomizedPCA, PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-from sklearn.ensemble import BaggingRegressor, RandomForestRegressor
+from sklearn.ensemble import BaggingRegressor, RandomForestRegressor, GradientBoostingRegressor
 from sklearn.linear_model import Ridge
 
 def get_models_by_dataset(dataset_name):
@@ -88,6 +88,9 @@ def get_models_by_dataset(dataset_name):
 			[
 				('model', RandomForestRegressor(n_estimators=250, max_depth=15, n_jobs=-1))
 			],
+			[
+				('model', GradientBoostingRegressor())
+			]
 		]
 	}
 
